@@ -3,6 +3,7 @@
 #include "card.h"
 #include "deck.h"
 #include "evaluator.h"
+#include "game.h"
 
 namespace py = pybind11;
 
@@ -52,4 +53,28 @@ PYBIND11_MODULE(poker_env, m) {
 
     py::class_<Evaluator>(m, "Evaluator")
         .def_static("evaluate", &Evaluator::evaluate, "Evaluates 7 cards and returns a HandValue");
+
+    py::enum_<Action>(m, "Action")
+        .value("Fold", Action::Fold)
+        .value("Call", Action::Call)
+        .value("Raise", Action::Raise)
+        .export_values();
+
+    py::class_<Player>(m, "Player")
+        .def(py::init<>())
+        .def_readwrite("chips", &Player::chips)
+        .def_readwrite("currentBet", &Player::currentBet)
+        .def_readwrite("hasFolded", &Player::hasFolded)
+        .def_readwrite("holeCards", &Player::holeCards);
+
+    py::class_<Game>(m, "Game")
+        .def(py::init<int>())
+        .def("reset", &Game::reset)
+        .def("step", &Game::step)
+        .def_readwrite("pot", &Game::pot)
+        .def_readwrite("currentToCall", &Game::currentToCall)
+        .def_readwrite("activePlayer", &Game::activePlayer)
+        .def_readwrite("street", &Game::street)
+        .def_readwrite("communityCards", &Game::communityCards)
+        .def_readwrite("players", &Game::players);
 }
